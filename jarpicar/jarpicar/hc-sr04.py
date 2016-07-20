@@ -6,7 +6,7 @@
 
 import time
 import threading
-
+import 
 # gpio
 import RPi.GPIO as gpio
 gpio.setmode(gpio.BCM)
@@ -42,34 +42,36 @@ class DistanceSensor(threading._Timer):
         return bRet
 
     def distance(self):
-	    # setze Trigger auf HIGH
-	    GPIO.output(GPIO_TRIGGER, True)
-
-	    # setze Trigger nach 0.01ms aus LOW
+        
+        # start measure with trigger
+        GPIO.output(self.PinTrigger, True)
 	    time.sleep(0.00001)
-	    GPIO.output(GPIO_TRIGGER, False)
+	    GPIO.output(self.PinTrigger, False)
 
 	    StartZeit = time.time()
 	    StopZeit = time.time()
 
 	    # speichere Startzeit
-	    while GPIO.input(GPIO_ECHO) == 0:
+	    while GPIO.input(self.PinEcho) == 0:
 		    StartZeit = time.time()
 
 	    # speichere Ankunftszeit
-	    while GPIO.input(GPIO_ECHO) == 1:
+	    while GPIO.input(self.PinEcho) == 1:
 		    StopZeit = time.time()
 
 	    # Zeit Differenz zwischen Start und Ankunft
 	    TimeElapsed = StopZeit - StartZeit
 	    # mit der Schallgeschwindigkeit (34300 cm/s) multiplizieren
 	    # und durch 2 teilen, da hin und zurueck
-	    distanz = (TimeElapsed * 34300) / 2
+	    distance = (TimeElapsed * 34300) / 2
 
-	    return distanz
+	    return distance
 
     # constructur/destructor
-    def __init__(self, PinTrigger, PinEcho, Interval=None, function=None, SensorName=None, args=None, kwargs=None): 
+    def __init__(self, PinTrigger, PinEcho, SensorName=None, Interval=None, function=None, args=None, kwargs=None): 
+        
+        threading._Timer.__init__(self, Interval=None, function=None, args=None, kwargs=None)
+        threading._Timer.setName = SensorName
         self.Name = SensorName
         self.PinTrigger = PinTrigger
         self.PinEcho = PinEcho
@@ -87,6 +89,7 @@ class DistanceSensor(threading._Timer):
             if PinEnable > 0:
                 gpio.setup(PinEnable, gpio.OUT, initial=0)
             self.Initialized = True
+
 
     def __del__(self):
         print ('destructor: %s!') % self.Name
