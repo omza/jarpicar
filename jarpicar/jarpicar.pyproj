@@ -20,7 +20,7 @@
     <RootNamespace>jarpicar</RootNamespace>
     <InterpreterId>{e81c3e04-9c8e-4432-9455-11415f4bf775}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
-    <NameOfLastUsedPublishProfile>MZARASPPI.py</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>jarpicar</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,6 +56,7 @@
     <Folder Include="jarpicar\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="jarpicar.pubxml" />
     <Content Include="jarpicar\static\css\antoncarone.css" />
     <Content Include="jarpicar\static\css\bootstrap.css" />
     <Content Include="jarpicar\static\css\bootstrap.min.css" />
@@ -110,7 +111,6 @@
     <Content Include="jarpicar\static\sass\_variables.scss" />
     <Content Include="jarpicar\templates\controller.html" />
     <Content Include="jarpicar\templates\log.html" />
-    <None Include="MZARASPPI.py.pubxml" />
     <Content Include="requirements.txt" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.svg" />
