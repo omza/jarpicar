@@ -1,33 +1,53 @@
-{% extends "layout.html" %}
+﻿{% extends "layout.html" %}
 
-{% block content %}
+{% block navheader %}
 
-<div class="jumbotron">
-    <h1>Flask</h1>
-    <p class="lead">Flask is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://flask.pocoo.org/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            Flask gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://flask.pocoo.org/docs/">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.python.org/pypi">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Microsoft Azure</h2>
-        <p>You can easily publish to Microsoft Azure using Python Tools for Visual Studio. Find out how you can host your application using a free trial today.</p>
-        <p><a class="btn btn-default" href="http://azure.microsoft.com">Learn more &raquo;</a></p>
-    </div>
-</div>
+    <form method="post" class="inline">
+        <a class="navbar-brand page-scroll" href="/startsession">
+            <i class="fa fa-play-circle"></i>  Start<span class="light"> Engines</span>
+        </a>    
+    </form>
 
 {% endblock %}
+
+
+{% block navmenu %}
+    <ul class="nav navbar-nav">
+        <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+        <li class="hidden">
+            <a href="/startsession"></a>
+        </li>
+        <li>
+            <a class="page-scroll" href="/#post">Post</a>
+        </li>
+        <li>
+            <a class="page-scroll" href="/log">Log</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block header %}
+<header class="intro">
+    <div class="intro-body">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <h1 class="brand-heading">jarpicar</h1>
+                    <p class="intro-text">[j]ust [a]nother [r]aspberry [pi] [car]</p>
+                </div>
+            </div>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+
+

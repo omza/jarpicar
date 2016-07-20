@@ -1,0 +1,61 @@
+﻿{% extends "layout.html" %}
+
+{% block navheader %}
+    <a class="navbar-brand page-scroll" href="/stopsession">
+        <i class="fa fa-play-circle"></i>  Stop<span class="light"> Engines</span>
+    </a>                    
+{% endblock %}
+
+
+{% block navmenu %}
+    <ul class="nav navbar-nav">
+        <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+        <li class="hidden">
+            <a href="/stopsession"></a>
+        </li>
+        <li>
+            <a class="page-scroll" href="/#post">Post</a>
+        </li>
+        <li>
+            <a class="page-scroll" href="/log">Log</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+<header class="intro">
+    <div class="intro-body">
+        <div class="container">
+            <div class="flashpanel">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            {{ message }}</br>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="controlpanel">
+                <div class="leftpanel">
+                    <a href="/forward" class="round-button">&uarr;</a>
+                    <a href="/stop" class="round-button">X</a>
+                    <a href="/back" class="round-button">&darr;</a>
+                </div>
+                <div class="rightpanel">
+                    <div style="float:left;margin-right:5px;">
+                        <a href="/left" class="round-button">&larr;</a>
+                    </div>
+                    <div style="float:left;margin-right:5px;">
+                        <a href="/ahead" class="round-button">X</a>
+                    </div>
+                    <div style="float:left;margin-right:5px;">
+                        <a href="/right" class="round-button">&rarr;</a>
+                    </div>
+                </div>
+            </div>  
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+

@@ -1,0 +1,74 @@
+﻿{% extends "layout.html" %}
+
+{% block navheader %}
+    {% if not session.uuid %}
+        <a class="navbar-brand page-scroll" href="/">
+            <i class="fa fa-play-circle"></i>  Back<span class="light">  to Home</span>
+        </a>  
+    {% else %}
+        <a class="navbar-brand page-scroll" href="/controller">
+            <i class="fa fa-play-circle"></i>  Back<span class="light">  to Controller</span>
+        </a>  
+    {% endif %}
+                  
+{% endblock %}
+
+{% block navmenu %}
+    <ul class="nav navbar-nav">
+        <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+        {% if not session.uuid %}
+            <li class="hidden">
+                <a href="/"></a>
+            </li>
+        {% else %}
+            <li class="hidden">
+                <a href="/controller"></a>
+            </li>
+        {% endif %}
+        <li>
+            <a class="page-scroll" href="/#post">Post</a>
+        </li>
+        <li>
+            <a class="page-scroll" href="#Log">Log</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <!-- Header -->
+    <header class="intro">
+        <div class="intro-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h1 class="brand-heading">jarpicar</h1>
+                        {% if not session.uuid %}
+                            <p class="intro-text">Zeige alle Logeinträge der letzten Session</p>
+                        {% else %}
+                            <p class="intro-text">Zeige alle Logeinträge Deiner aktuellen Session</p>
+                        {% endif %}
+                        <a href="#Log" class="btn btn-circle page-scroll">
+                            <i class="fa fa-angle-double-down animated"></i>
+                        </a>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block section %}
+    <!-- Log Section -->
+    <section id="Log" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Session Log:</h2>
+                {% for logitem in data.sessionlog %}
+                    {{ logitem[1] }} : {{ logitem[0] }} <br/>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
