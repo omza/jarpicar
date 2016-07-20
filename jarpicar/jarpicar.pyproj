@@ -20,6 +20,7 @@
     <RootNamespace>jarpicar</RootNamespace>
     <InterpreterId>{e81c3e04-9c8e-4432-9455-11415f4bf775}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
+    <NameOfLastUsedPublishProfile>MZARASPPI.py</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,7 +53,6 @@
     <Folder Include="jarpicar\static\js\" />
     <Folder Include="jarpicar\static\less\" />
     <Folder Include="jarpicar\static\sass\" />
-    <Folder Include="jarpicar\static\scripts\" />
     <Folder Include="jarpicar\templates\" />
   </ItemGroup>
   <ItemGroup>
@@ -110,26 +110,12 @@
     <Content Include="jarpicar\static\sass\_variables.scss" />
     <Content Include="jarpicar\templates\controller.html" />
     <Content Include="jarpicar\templates\log.html" />
+    <None Include="MZARASPPI.py.pubxml" />
     <Content Include="requirements.txt" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="jarpicar\static\scripts\bootstrap.js" />
-    <Content Include="jarpicar\static\scripts\bootstrap.min.js" />
-    <Content Include="jarpicar\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="jarpicar\static\scripts\jquery-1.10.2.js" />
-    <Content Include="jarpicar\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="jarpicar\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="jarpicar\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="jarpicar\static\scripts\jquery.validate.js" />
-    <Content Include="jarpicar\static\scripts\jquery.validate.min.js" />
-    <Content Include="jarpicar\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="jarpicar\static\scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="jarpicar\static\scripts\modernizr-2.6.2.js" />
-    <Content Include="jarpicar\static\scripts\respond.js" />
-    <Content Include="jarpicar\static\scripts\respond.min.js" />
-    <Content Include="jarpicar\static\scripts\_references.js" />
     <Content Include="jarpicar\templates\about.html" />
     <Content Include="jarpicar\templates\contact.html" />
     <Content Include="jarpicar\templates\index.html" />
