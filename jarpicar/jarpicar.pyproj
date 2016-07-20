@@ -116,8 +116,6 @@
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="jarpicar\static\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="jarpicar\templates\about.html" />
-    <Content Include="jarpicar\templates\contact.html" />
     <Content Include="jarpicar\templates\index.html" />
     <Content Include="jarpicar\templates\layout.html" />
   </ItemGroup>
