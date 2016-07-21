@@ -46,17 +46,16 @@ class DistanceSensor(threading.Thread):
         if dummy not in [-1,1]: 
             logger.debug('PinEcho in use: %s!', pin_use[dummy])
             self.flash = ('PinEcho in use: %s!') % pin_use[dummy]
-           bRet = False
+            bRet = False
        
         return bRet
 
     def distance(self):
         # start measure with trigger
         gpio.output(self.PinTrigger, True)
-	    time.sleep(0.00001)
-	    gpio.output(self.PinTrigger, False)
-
-	    StartZeit = time.time()
+        time.sleep(0.00001)
+        gpio.output(self.PinTrigger, False)
+        StartZeit = time.time()
 	    StopZeit = time.time()
 
 	    # speichere Startzeit
@@ -79,7 +78,7 @@ class DistanceSensor(threading.Thread):
     def __init__(self, PinTrigger, PinEcho, SensorName=None, interval=1): 
         logger.info('constructor: %s!', SensorName)
         threading.Thread.__init__(self, group=None, target=None, name=SensorName, args=(), kwargs={})
-        threading.Thread.setDaemon(self) = True
+        threading.Thread.setDaemon(self,True)
         self.cancel = threading.Event()
         self.PinTrigger = PinTrigger
         self.PinEcho = PinEcho
@@ -111,7 +110,6 @@ class DistanceSensor(threading.Thread):
 
     def stop(self):
         self.cancel.set()
-        pass
 
 # Main
 # --------------------------------------------------------------
