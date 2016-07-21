@@ -35,16 +35,19 @@ class DistanceSensor(threading.Thread):
     # methods
     def pincheck(self):
         bRet = True
+        
         dummy = gpio.gpio_function(self.PinTrigger)
         if dummy not in [-1,1.0]: 
             logger.debug('PinTrigger in use: %s!', pin_use[dummy])
             self.flash = ('PinTrigger in use: %s!') % pin_use[dummy]
             bRet = False
+        
         dummy = gpio.gpio_function(self.PinEcho)
         if dummy not in [-1,1]: 
             logger.debug('PinEcho in use: %s!', pin_use[dummy])
             self.flash = ('PinEcho in use: %s!') % pin_use[dummy]
            bRet = False
+       
         return bRet
 
     def distance(self):
