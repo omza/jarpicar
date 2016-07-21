@@ -1,12 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# credits
+# --------------------------------------------------------------
+# https://pymotw.com/2/threading/
+# https://docs.python.org/2/library/threading.html
+
+
+
+
 # imports, globals
 # --------------------------------------------------------------
 
 import time
 import threading
-import 
+
+#logging
+import logging
+logging.basicConfig(level=logging.DEBUG, format='(%(threadName)-10s) %(message)s',)
+
 # gpio
 import RPi.GPIO as gpio
 gpio.setmode(gpio.BCM)
@@ -21,42 +33,36 @@ pin_use = {0:"GPIO.OUT", 1:"GPIO.IN", 40:"GPIO.SERIAL", 41:"GPIO.SPI", 42:"GPIO.
 # classes, modules
 # --------------------------------------------------------------
 
-class DistanceSensor(threading._Timer):
+class DistanceSensor(threading.Thread):
 
     # methods
     def pincheck(self):
         bRet = True
-        dummy = gpio.gpio_function(self.PinIn1)
-        if dummy not in [-1,1]: 
+        dummy = gpio.gpio_function(self.PinTrigger)
+        if dummy not in [-1,1.0]: 
             self.Log = ('PinIn1: %s!') % pin_use[dummy]
             bRet = False
-        dummy = gpio.gpio_function(self.PinIn2)
+        dummy = gpio.gpio_function(self.PinEcho)
         if dummy not in [-1,1]: 
            self.Log = ('PinIn2: %s!') % pin_use[dummy]
            bRet = False
-        if self.PinEnable > 0:
-            dummy = gpio.gpio_function(self.PinEnable)
-            if dummy not in [-1,1]: 
-                self.Log = ('PinEnable: %s!') % pin_use[dummy]
-                bRet = False
         return bRet
 
     def distance(self):
-        
         # start measure with trigger
-        GPIO.output(self.PinTrigger, True)
+        gpio.output(self.PinTrigger, True)
 	    time.sleep(0.00001)
-	    GPIO.output(self.PinTrigger, False)
+	    gpio.output(self.PinTrigger, False)
 
 	    StartZeit = time.time()
 	    StopZeit = time.time()
 
 	    # speichere Startzeit
-	    while GPIO.input(self.PinEcho) == 0:
+	    while gpio.input(self.PinEcho) == 0:
 		    StartZeit = time.time()
 
 	    # speichere Ankunftszeit
-	    while GPIO.input(self.PinEcho) == 1:
+	    while gpio.input(self.PinEcho) == 1:
 		    StopZeit = time.time()
 
 	    # Zeit Differenz zwischen Start und Ankunft
@@ -68,14 +74,14 @@ class DistanceSensor(threading._Timer):
 	    return distance
 
     # constructur/destructor
-    def __init__(self, PinTrigger, PinEcho, SensorName=None, Interval=None, function=None, args=None, kwargs=None): 
+    def __init__(self, PinTrigger, PinEcho, SensorName=None, interval=1): 
         
-        threading._Timer.__init__(self, Interval=None, function=None, args=None, kwargs=None)
-        threading._Timer.setName = SensorName
-        self.Name = SensorName
+        threading.Thread.__init__(self, group=None, target=None, name=SensorName, args=(), kwargs={})
+        self.
+        self.cancel = threading.Event()
         self.PinTrigger = PinTrigger
         self.PinEcho = PinEcho
-        self.PinEnable = PinEnable
+        self.interval = interval
         self.Log = ('constructor: %s!') % self.Name
         self.Initialized = False
         
@@ -84,19 +90,25 @@ class DistanceSensor(threading._Timer):
 
         if bCheck:
             # gpio setup for pins
-            gpio.setup(PinIn2, gpio.OUT, initial=0)
-            gpio.setup(PinIn1, gpio.OUT, initial=0)
-            if PinEnable > 0:
-                gpio.setup(PinEnable, gpio.OUT, initial=0)
+            gpio.setup(self.PinTrigger, GPIO.OUT)
+            gpio.setup(self.PinEcho, GPIO.IN)  
             self.Initialized = True
 
 
     def __del__(self):
-        print ('destructor: %s!') % self.Name
-        if self.PinEnable > 0:
-            gpio.cleanup([self.PinIn1, self.PinIn2, self.PinEnable])
-        else:
-            gpio.cleanup([self.PinIn1, self.PinIn2])
+        print ('destructor: %s!') % self
+        gpio.cleanup([self.PinIn1, self.PinIn2])
+
+    # Start & Stop
+
+    def run(self):
+        while not self.cancel.is_set():
+
+            self.cancel.wait(self.int)
+
+
+    def stop(self):
+        self.cancel.set()
 
 # Main
 # --------------------------------------------------------------
@@ -112,8 +124,7 @@ def main():
         GPIO_ECHO = 24
 
         #Richtung der GPIO-Pins festlegen (IN / OUT)
-        GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
-        GPIO.setup(GPIO_ECHO, GPIO.IN)        
+      
 
 
     # ^C exit    
