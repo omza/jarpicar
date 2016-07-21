@@ -32,7 +32,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="jarpicar\AntonCarOne.py" />
     <Compile Include="jarpicar\camera_pi.py" />
     <Compile Include="jarpicar\hc-sr04.py" />
     <Compile Include="jarpicar\l298nBoard.py" />
