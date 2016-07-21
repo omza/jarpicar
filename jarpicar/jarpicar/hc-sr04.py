@@ -7,8 +7,6 @@
 # https://docs.python.org/2/library/threading.html
 
 
-
-
 # imports, globals
 # --------------------------------------------------------------
 
@@ -17,7 +15,6 @@ import threading
 
 #logging
 import logging
-logging.basicConfig(level=logging.DEBUG, format='(%(threadName)-10s) %(message)s',)
 
 # gpio
 import RPi.GPIO as gpio
@@ -40,11 +37,13 @@ class DistanceSensor(threading.Thread):
         bRet = True
         dummy = gpio.gpio_function(self.PinTrigger)
         if dummy not in [-1,1.0]: 
-            self.Log = ('PinIn1: %s!') % pin_use[dummy]
+            logger.debug('PinTrigger in use: %s!', pin_use[dummy])
+            self.flash = ('PinTrigger in use: %s!') % pin_use[dummy]
             bRet = False
         dummy = gpio.gpio_function(self.PinEcho)
         if dummy not in [-1,1]: 
-           self.Log = ('PinIn2: %s!') % pin_use[dummy]
+            logger.debug('PinEcho in use: %s!', pin_use[dummy])
+            self.flash = ('PinEcho in use: %s!') % pin_use[dummy]
            bRet = False
         return bRet
 
@@ -75,14 +74,14 @@ class DistanceSensor(threading.Thread):
 
     # constructur/destructor
     def __init__(self, PinTrigger, PinEcho, SensorName=None, interval=1): 
-        
+        logger.info('constructor: %s!', SensorName)
         threading.Thread.__init__(self, group=None, target=None, name=SensorName, args=(), kwargs={})
-        self.
+        threading.Thread.setDaemon(self) = True
         self.cancel = threading.Event()
         self.PinTrigger = PinTrigger
         self.PinEcho = PinEcho
         self.interval = interval
-        self.Log = ('constructor: %s!') % self.Name
+        self.flash = ('constructor: %s!', SensorName)
         self.Initialized = False
         
         # pins in use ?
@@ -96,43 +95,43 @@ class DistanceSensor(threading.Thread):
 
 
     def __del__(self):
-        print ('destructor: %s!') % self
-        gpio.cleanup([self.PinIn1, self.PinIn2])
+        logger.info('destructor: %s!', threading.Thread.getName(self))
+        gpio.cleanup([self.PinTrigger, self.PinEcho])
 
     # Start & Stop
-
     def run(self):
         while not self.cancel.is_set():
-
-            self.cancel.wait(self.int)
+            actualDistance = self.distance()
+            logger.info('Actual Distance is: %s!', actualDistance)
+            self.cancel.wait(self.interval)
 
 
     def stop(self):
         self.cancel.set()
+        pass
 
 # Main
 # --------------------------------------------------------------
 
 def main():
-    print ('Hello World from Class module %s!') % __name__
+    
+    logging.basicConfig(level=logging.DEBUG, format='(%(threadName)-10s) %(message)s',)
+    logger = logging.getLogger(__name__)
 
+    logger.info('Hello from main()')
 
     try:
-       
-        #GPIO Pins zuweisen
-        GPIO_TRIGGER = 18
-        GPIO_ECHO = 24
-
-        #Richtung der GPIO-Pins festlegen (IN / OUT)
-      
-
+        FrontDDC = DistanceSensor(PinTrigger=18, PinEcho=24, SensorName='FrontDDC', interval=0.1)
+        FrontDDC.start()
+        time.sleep(60)
+        FrontDDC.stop()
 
     # ^C exit    
     except KeyboardInterrupt:
-        print ('KeyboardInterrupt!')
+        logger.info('KeyboardInterrupt!')
 
     finally:
-        print ('Good Bye!')
+        logger.info('Good Bye!')
 
 
 
