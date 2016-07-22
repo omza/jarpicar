@@ -77,7 +77,9 @@ class DistanceSensor(threading.Thread):
 
     # Start & Stop
     def run(self):
-        logger.info('Start...')
+        logger.info('Warm up Sensor...' + DistanceSensor.getName(self))
+        gpio.output(self.PinTrigger, False)
+        time.sleep(2)
         while not self.cancel.is_set():
             actualDistance = self.distance()
             logger.debug('Actual Distance is: %s!', actualDistance)
@@ -95,23 +97,22 @@ def main():
     logger.info('Hello from main()')
     try:
         logger.info('try')
-        FrontDDC = DistanceSensor(PinTrigger=18, PinEcho=24, name='FrontDDC', interval=0.01)
-        BackDDC = DistanceSensor(PinTrigger=12, PinEcho=25, name='BackDDC', interval=0.01)
+        FrontDDC = DistanceSensor(PinTrigger=18, PinEcho=24, name='FrontDDC', interval=1)
+        #BackDDC = DistanceSensor(PinTrigger=12, PinEcho=25, name='BackDDC', interval=1)
         
         #logger.info(FrontDDC.isDeamon())
         FrontDDC.start()
-        BackDDC.start()
-
-        time.sleep(10)
-        
-        FrontDDC.stop()
-        BackDDC.stop()
-        #FrontDDC = None
-        #BackDDC = None
+        #BackDDC.start()
+        while True:
+            pass
+    
         logger.info('endtry')
+
     # ^C exit    
     except KeyboardInterrupt:
         logger.info('KeyboardInterrupt!')
+        FrontDDC.stop()
+        #BackDDC.stop()
 
     finally:
         logger.info('Good Bye!')    
