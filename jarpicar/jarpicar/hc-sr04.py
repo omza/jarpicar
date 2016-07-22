@@ -56,11 +56,11 @@ class DistanceSensor(threading.Thread):
         time.sleep(0.00001)
         gpio.output(self.PinTrigger, False)
         StartZeit = time.time()
-	    StopZeit = time.time()
+        StopZeit = time.time()
 
 	    # speichere Startzeit
 	    while gpio.input(self.PinEcho) == 0:
-		    StartZeit = time.time()
+            StartZeit = time.time()
 
 	    # speichere Ankunftszeit
 	    while gpio.input(self.PinEcho) == 1:
@@ -133,8 +133,6 @@ def main():
 
     finally:
         logger.info('Good Bye!')
-
-
 
 if __name__ == "__main__":
     main()
