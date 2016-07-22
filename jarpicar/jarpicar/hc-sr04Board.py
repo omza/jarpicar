@@ -29,7 +29,7 @@ pin_use = {0:"GPIO.OUT", 1:"GPIO.IN", 40:"GPIO.SERIAL", 41:"GPIO.SPI", 42:"GPIO.
 class DistanceSensor(threading.Thread):
 
     #measure distance with HC-SR04 super sonic Board
-    def distance(self):
+    def raw_measure(self):
         # start measure with trigger
         gpio.output(self.PinTrigger, True)
         time.sleep(0.00001)
@@ -44,11 +44,11 @@ class DistanceSensor(threading.Thread):
         # speichere Ankunftszeit
         while gpio.input(self.PinEcho) == 1:
             StopZeit = time.time()
-
+            
         # Zeit Differenz zwischen Start und Ankunft
-        TimeElapsed = StopZeit - StartZeit
         # mit der Schallgeschwindigkeit (34300 cm/s) multiplizieren
-        # und durch 2 teilen, da hin und zurueck
+        # und durch 2 teilen, da hin und zurueck            
+        TimeElapsed = StopZeit - StartZeit
         distance = (TimeElapsed * 34300) / 2
 
         return distance
@@ -72,7 +72,7 @@ class DistanceSensor(threading.Thread):
  
     # overload destructor
     def __del__(self):
-        logger.info('destruct DistanceSensor Instance')
+        logger.info('destruct DistanceSensor Instance' + DistanceSensor.getName(self))
         gpio.cleanup([self.PinTrigger, self.PinEcho])    
 
     # Start & Stop
@@ -81,8 +81,8 @@ class DistanceSensor(threading.Thread):
         gpio.output(self.PinTrigger, False)
         time.sleep(2)
         while not self.cancel.is_set():
-            actualDistance = self.distance()
-            logger.debug('Actual Distance is: %s!', actualDistance)
+            CurrentDist = self.raw_measure()
+            logger.debug('Current Distance is: %s!', CurrentDist)
             self.cancel.wait(self.interval)
 
 
@@ -97,12 +97,11 @@ def main():
     logger.info('Hello from main()')
     try:
         logger.info('try')
-        FrontDDC = DistanceSensor(PinTrigger=18, PinEcho=24, name='FrontDDC', interval=1)
-        #BackDDC = DistanceSensor(PinTrigger=12, PinEcho=25, name='BackDDC', interval=1)
+        FrontDDC = DistanceSensor(PinTrigger=18, PinEcho=24, name='FrontDDC', interval=0.2)
+        BackDDC = DistanceSensor(PinTrigger=12, PinEcho=25, name='BackDDC', interval=0.2)
         
-        #logger.info(FrontDDC.isDeamon())
         FrontDDC.start()
-        #BackDDC.start()
+        BackDDC.start()
         while True:
             pass
     
@@ -112,7 +111,7 @@ def main():
     except KeyboardInterrupt:
         logger.info('KeyboardInterrupt!')
         FrontDDC.stop()
-        #BackDDC.stop()
+        BackDDC.stop()
 
     finally:
         logger.info('Good Bye!')    
