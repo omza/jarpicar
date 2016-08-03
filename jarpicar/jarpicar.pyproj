@@ -34,9 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="jarpicar\camera_pi.py" />
-    <Compile Include="jarpicar\hc-sr04Board.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="jarpicar\hc-sr04Board.py" />
     <Compile Include="jarpicar\l298nBoard.py" />
     <Compile Include="runserver.py" />
     <Compile Include="jarpicar\__init__.py" />

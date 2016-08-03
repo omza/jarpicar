@@ -1,35 +1,89 @@
 
-# credits
+# hc-sr04Board.py
+# --------------------------------------------------------------
+# 
+
+
+# credits & resources
 # --------------------------------------------------------------
 # https://pymotw.com/2/threading/
 # https://docs.python.org/2/library/threading.html
+# http://stackoverflow.com/questions/3393612/run-certain-code-every-n-seconds
+# https://pymotw.com/2/multiprocessing/basics.html
+# https://docs.python.org/3/tutorial/errors.html
+
 
 
 # imports, globals
 # --------------------------------------------------------------
 import time
-import threading
+import multiprocessing
+import warnings
 
 #logging
 import logging
-logging.basicConfig(level=logging.DEBUG, format='(%(threadName)-10s) %(message)s',)
-logger = logging.getLogger(__name__)
+FORMAT = '%(asctime)s - %(processName)s - %(levelname)s - %(message)s'
+log_level = logging.INFO
+
+logFormat = logging.Formatter(FORMAT)
+logHandler = logging.StreamHandler()
+logHandler.setLevel(log_level)
+logHandler.setFormatter(logFormat)
+
+logger = multiprocessing.get_logger()
+logger.setLevel(log_level)
+logger.addHandler(logHandler)
 
 # gpio
 import RPi.GPIO as gpio
 gpio.setmode(gpio.BCM)
 
-# Using a dictionary as a lookup table to give a name to gpio_function() return code  
-pin_use = {0:"GPIO.OUT", 1:"GPIO.IN", 40:"GPIO.SERIAL", 41:"GPIO.SPI", 42:"GPIO.I2C", 43:"GPIO.HARD_PWM", -1:"GPIO.UNKNOWN"} 
+# User Exceptions
+# --------------------------------------------------------------
 
+class GpioPinUseError(Exception):
+
+    def __init__(self,*args,**kwargs):
+        Exception.__init__(self,*args,**kwargs)
+        self.message = 'GPIO Warning: This Pin is already in use!'
 
 # classes, modules
 # --------------------------------------------------------------
 
-class DistanceSensor(threading.Thread):
+class DistanceSensorProcess(multiprocessing.Process):
+    
+    #constructor
+    def __init__(self, PinTrigger, PinEcho, Sensor=None, handler=None, *args,**kwargs):
+        multiprocessing.Process.__init__(self, group=None, target=None, name=Sensor, *args,**kwargs)
 
-    #measure distance with HC-SR04 super sonic Board
-    def raw_measure(self):
+
+    #destructor
+    def __del__(self):
+        pass
+
+
+class DistanceSensor(object):
+
+    # gpio setup for HC-SR04 with warnings for pin use
+    def _hcsr04_gpio_setup(self):
+        
+        # gpio Warnings Catch !!!
+        # gpio setup for pins
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+           
+            gpio.setup(self.PinTrigger, gpio.OUT)
+            gpio.setup(self.PinEcho, gpio.IN)   
+            
+            for warning in w:
+                 logger.warning(str(warning._category_name) + ': ' + str(warning.message))
+                                  
+                 if 'This channel is already in use' in str(warning.message):
+                     raise GpioPinUseError
+    
+
+    # measure distance with HC-SR04 super sonic Board
+    def distance(self):
         # start measure with trigger
         gpio.output(self.PinTrigger, True)
         time.sleep(0.00001)
@@ -50,71 +104,77 @@ class DistanceSensor(threading.Thread):
         # und durch 2 teilen, da hin und zurueck            
         TimeElapsed = StopZeit - StartZeit
         distance = (TimeElapsed * 34300) / 2
-
+        logger.debug('current distance is %3.2f', distance)
         return distance
- 
 
-    #overload constructor
-    def __init__(self, PinTrigger, PinEcho, interval=1, group=None, target=None, name=None, args=None, kwargs=None):
-        
-        logger.info('Construct DistanceSensor Instance %s!', name)
-        threading.Thread.__init__(self, group=None, target=None, name=name, args=args, kwargs=kwargs)
-        DistanceSensor.setDeamon = True
-        self.cancel = threading.Event()
-        self.PinTrigger = PinTrigger
-        self.PinEcho = PinEcho
-        self.interval = interval
-        self.flash = ('constructor: %s!', name)
-
-        # gpio setup for pins
-        gpio.setup(self.PinTrigger, gpio.OUT)
-        gpio.setup(self.PinEcho, gpio.IN)
- 
-    # overload destructor
-    def __del__(self):
-        logger.info('destruct DistanceSensor Instance' + DistanceSensor.getName(self))
-        gpio.cleanup([self.PinTrigger, self.PinEcho])    
-
-    # Start & Stop
-    def run(self):
-        logger.info('Warm up Sensor...' + DistanceSensor.getName(self))
+    def warm_up(self):
+        logger.info('Warm up Sensor...%s', self.SensorName)
         gpio.output(self.PinTrigger, False)
         time.sleep(2)
-        while not self.cancel.is_set():
-            CurrentDist = self.raw_measure()
-            logger.debug('Current Distance is: %s!', CurrentDist)
-            self.cancel.wait(self.interval)
 
+    def __init__(self, PinTrigger, PinEcho, Sensor=None):
+        self.SensorName = Sensor
+        self.PinTrigger = PinTrigger
+        self.PinEcho = PinEcho
 
-    def stop(self):
-        logger.info('Stop...')
-        self.cancel.set()
- 
+        self._hcsr04_gpio_setup()
+               
+        logger.info('construct DistanceSensor %s.', self.SensorName)
+
+    # destructor
+    def __del__(self):
+        gpio.cleanup([self.PinTrigger, self.PinEcho])
+        logger.info('destruct DistanceSensor Instance %s.', self.SensorName)
+    
 
 # Main
 #----------------------------------------------------------------
+
 def main():
     logger.info('Hello from main()')
+
+    # Handler
+    def DDCHandler(DistanceSensor): 
+        DistanceSensor.warm_up()
+        while True:
+            Distance = DistanceSensor.distance()
+            if Distance < 5.0:
+                logger.info('Dont you touch me! You are away %s cm in my %s!', Distance, DistanceSensor.SensorName)
+
+
+
+
+         
     try:
-        logger.info('try')
-        FrontDDC = DistanceSensor(PinTrigger=18, PinEcho=24, name='FrontDDC', interval=0.2)
-        BackDDC = DistanceSensor(PinTrigger=12, PinEcho=25, name='BackDDC', interval=0.2)
-        
-        FrontDDC.start()
-        BackDDC.start()
+        logger.info('Starting...')
+
+        FrontSensor = DistanceSensor(PinTrigger=18,PinEcho=24,Sensor='jarpicar Frontsensor')
+        FrontDDC = multiprocessing.Process(name='Front-DDC',target=DDCHandler, args=[FrontSensor])
+        FrontDDC.daemon = True
+
+        FrontDDC.start()       
+
+
         while True:
             pass
-    
-        logger.info('endtry')
 
-    # ^C exit    
-    except KeyboardInterrupt:
-        logger.info('KeyboardInterrupt!')
-        FrontDDC.stop()
-        BackDDC.stop()
+      
+    except Exception as e:
+        logger.exception(str(e.message))
+
 
     finally:
+        logger.info('cleanup')
+
+        FrontDDC.terminate()
+        FrontDDC.join()
+        del FrontSensor
+
+        time.sleep(2)
         logger.info('Good Bye!')    
 
 if __name__ == "__main__":
     main()
+
+
+
