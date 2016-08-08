@@ -11,7 +11,7 @@
 # http://stackoverflow.com/questions/3393612/run-certain-code-every-n-seconds
 # https://pymotw.com/2/multiprocessing/basics.html
 # https://docs.python.org/3/tutorial/errors.html
-
+# https://de.wikipedia.org/wiki/Schallgeschwindigkeit
 
 
 # imports, globals
@@ -63,6 +63,13 @@ class DistanceSensorProcess(multiprocessing.Process):
 
 
 class DistanceSensor(object):
+    
+    #Sonic speed by tempetrature in cm/s
+    tempsonicspeed = [[-25, 31591], [-20, 31909], [-15, 32223], [-10, 32535], [-5, 32844], [0, 33150], 
+        [5, 33453], [10, 33754], [15, 34051], [20, 34346],  [25, 34639],  [30, 34929],  [35, 35217]]
+    
+    #measure of length
+    measureoflength ={'m': 0.01, 'cm': 1, 'mm': 100}
 
     # gpio setup for HC-SR04 with warnings for pin use
     def _hcsr04_gpio_setup(self):
@@ -112,12 +119,15 @@ class DistanceSensor(object):
         gpio.output(self.PinTrigger, False)
         time.sleep(2)
 
-    def __init__(self, PinTrigger, PinEcho, Sensor=None):
+    def __init__(self, PinTrigger, PinEcho, Sensor=None, temp=20, measureoflenght='cm'):
         self.SensorName = Sensor
         self.PinTrigger = PinTrigger
         self.PinEcho = PinEcho
 
         self._hcsr04_gpio_setup()
+
+        #calc distance temp and measurement factor
+        
                
         logger.info('construct DistanceSensor %s.', self.SensorName)
 
