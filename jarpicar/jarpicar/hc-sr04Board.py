@@ -110,7 +110,7 @@ class DistanceSensor(object):
         # mit der Schallgeschwindigkeit (34300 cm/s) multiplizieren
         # und durch 2 teilen, da hin und zurueck            
         TimeElapsed = StopZeit - StartZeit
-        distance = (TimeElapsed * 34300) / 2
+        distance = (TimeElapsed * self.SonicSpeed * self.Factor) / 2
         logger.debug('current distance is %3.2f', distance)
         return distance
 
@@ -123,11 +123,13 @@ class DistanceSensor(object):
         self.SensorName = Sensor
         self.PinTrigger = PinTrigger
         self.PinEcho = PinEcho
-
+        self.Temperature = temp
         self._hcsr04_gpio_setup()
-
+ 
         #calc distance temp and measurement factor
-        
+        sonicspeed = next(row for row in tempsonicspeed if row[0] <= self.Temperature)
+        self.SonicSpeed = sonicspeed[1]
+        self.Factor = measureoflength(measureoflenght)
                
         logger.info('construct DistanceSensor %s.', self.SensorName)
 
